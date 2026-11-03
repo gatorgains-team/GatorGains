@@ -17,14 +17,22 @@ vi.mock('@supabase/supabase-js', () => ({
   }),
 }))
 
-vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
-vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'test-key')
-
-import { logIn, signUp, supabase } from './supabase.js'
+let logIn
+let signUp
+let supabase
 
 describe('Supabase authentication error cases', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    vi.resetModules()
     vi.clearAllMocks()
+
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'test-key')
+
+    const module = await import('./supabase.js')
+    logIn = module.logIn
+    signUp = module.signUp
+    supabase = module.supabase
   })
 
   it('rejects login with an incorrect password', async () => {
@@ -98,3 +106,4 @@ describe('Supabase authentication error cases', () => {
     expect(supabase).not.toBeNull()
   })
 })
+
